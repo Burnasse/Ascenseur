@@ -1,8 +1,9 @@
 package com.company;
 
+import com.company.frontend.GlobalPanel;
+
 import javax.swing.*;
 import java.awt.*;
-import java.util.LinkedList;
 
 public class Main {
 

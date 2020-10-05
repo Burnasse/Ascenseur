@@ -1,4 +1,4 @@
-package com.company;
+package com.company.frontend;
 
 import javax.swing.*;
 import java.awt.*;
