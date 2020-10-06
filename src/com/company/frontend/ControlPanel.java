@@ -1,5 +1,7 @@
 package com.company.frontend;
 
+import com.company.backend.Operator;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.LinkedList;
@@ -11,7 +13,9 @@ public class ControlPanel extends JPanel{
     private JPanel elevatorPanel = new JPanel();
     private JPanel outDoorPanel = new JPanel();
 
-    public ControlPanel(int floorNumber, JTextField floorTextField, JTextField motorTextField, JTextField doorTextField, LinkedList<JPanel> elevatorPanels){
+    private Operator operator;
+
+    public ControlPanel(int floorNumber, JTextField floorTextField, JTextField motorTextField, JTextField doorTextField, LinkedList<JPanel> elevatorPanels,Operator operator){
         setLayout(new GridLayout(1,2));
 
         GridLayout elevatorPanelLayout = new GridLayout(floorNumber + 2,1);
@@ -20,12 +24,32 @@ public class ControlPanel extends JPanel{
         elevatorPanel.setLayout(elevatorPanelLayout);
         outDoorPanel.setLayout(outDoorPanelLayout);
 
-        for (int i = 0; i < 6; i++) {
+        this.operator = operator;
+
+        for (int i = 0; i < floorNumber; i++) {
+            int floor = i;
+
+            /* creation bouton de l'etage i interieur */
             FloorButton newButton = new FloorButton(floorTextField,elevatorPanels,i);
+            newButton.addActionListener(e->{
+                operator.newRequestInsideCabin(floor);
+            });
+
             elevatorPanel.add(newButton);
 
+            /* creation bouton up de l'etage i*/
             JButton callH = new JButton("H"+i);
+            callH.addActionListener(e->{
+                this.operator.newUpRequestOutsideCabin(floor);
+                    }
+            );
+            /* creation bouton down de l'etage i*/
+
             JButton callD = new JButton("D"+i);
+            callD.addActionListener(e->{
+                        this.operator.newDownRequestOutsideCabin(floor);
+                    }
+            );
             outDoorPanel.add(callH);
             outDoorPanel.add(callD);
         }

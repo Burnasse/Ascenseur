@@ -2,9 +2,14 @@ package com.company.backend;
 
 public class Cabin {
 
-    private int floor = 0;
+    private int floor ;
 
-    private Direction direction = Direction.NONE;
+    private Direction direction ;
+
+    public Cabin() {
+        this.floor = 0;
+        this.direction = Direction.NONE;
+    }
 
     public int getFloor() {
         return floor;
