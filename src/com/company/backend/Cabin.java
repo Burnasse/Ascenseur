@@ -1,10 +1,15 @@
 package com.company.backend;
 
+import com.company.frontend.GlobalPanel;
+
+import javax.swing.*;
+import java.awt.*;
+
 public class Cabin {
 
-    private int floor ;
+    private int floor;
 
-    private Direction direction ;
+    private Direction direction;
 
     public Cabin() {
         this.floor = 0;
@@ -17,6 +22,14 @@ public class Cabin {
 
     public void setFloor(int floor) {
         this.floor = floor;
+
+        GlobalPanel.displayPanel.getFloorTextField().setText("Floor: " + floor);
+        for (JPanel current : GlobalPanel.displayPanel.getFloorRectList()) {
+            if (GlobalPanel.displayPanel.getFloorRectList().indexOf(current) == GlobalPanel.FLOOR_NUMBER - (floor + 1))
+                current.setBackground(Color.BLACK);
+            else current.setBackground(Color.WHITE);
+        }
+
     }
 
     public Direction getDirection() {

@@ -9,18 +9,16 @@ public class GlobalPanel extends JPanel {
 
     public static final int FLOOR_NUMBER = 6;
 
+    public static DisplayPanel displayPanel = new DisplayPanel(FLOOR_NUMBER);
+    public static ControlPanel controlPanel = new ControlPanel(FLOOR_NUMBER,
+            displayPanel.getFloorTextField(),
+            displayPanel.getMotorTextField(),
+            displayPanel.getDoorTextField(),
+            displayPanel.getFloorRectList(),
+            new Operator(FLOOR_NUMBER));
+
     public GlobalPanel(){
         setLayout(new GridLayout(2,1));
-
-        DisplayPanel displayPanel = new DisplayPanel(FLOOR_NUMBER);
-        Operator operator = new Operator(FLOOR_NUMBER);
-        ControlPanel controlPanel = new ControlPanel(
-                FLOOR_NUMBER,
-                displayPanel.getFloorTextField(),
-                displayPanel.getMotorTextField(),
-                displayPanel.getDoorTextField(),
-                displayPanel.getFloorRectList(),
-                operator);
 
         add(displayPanel);
         add(controlPanel);

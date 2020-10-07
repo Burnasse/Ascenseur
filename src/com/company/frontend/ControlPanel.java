@@ -30,7 +30,7 @@ public class ControlPanel extends JPanel{
             int floor = i;
 
             /* creation bouton de l'etage i interieur */
-            FloorButton newButton = new FloorButton(floorTextField,elevatorPanels,i);
+            FloorButton newButton = new FloorButton(i);
             newButton.addActionListener(e->{
                 operator.newRequestInsideCabin(floor);
             });
@@ -40,14 +40,14 @@ public class ControlPanel extends JPanel{
             /* creation bouton up de l'etage i*/
             JButton callH = new JButton("H"+i);
             callH.addActionListener(e->{
-                this.operator.newUpRequestOutsideCabin(floor);
+                this.operator.newRequestInsideCabin(floor);
                     }
             );
             /* creation bouton down de l'etage i*/
 
             JButton callD = new JButton("D"+i);
             callD.addActionListener(e->{
-                        this.operator.newDownRequestOutsideCabin(floor);
+                        this.operator.newRequestInsideCabin(floor);
                     }
             );
             outDoorPanel.add(callH);

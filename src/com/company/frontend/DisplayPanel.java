@@ -27,10 +27,10 @@ public class DisplayPanel extends JPanel{
         JPanel elevatorPanel = new JPanel();
         elevatorPanel.setLayout(new GridLayout(6,1));
 
-        for (int i = 0; i < floorNumber; i++) {
+        for (int i = floorNumber; i > 0; i--) {
             JPanel floorPanel = new JPanel();
             floorRectList.add(floorPanel);
-            if(i==floorNumber-1)floorPanel.setBackground(Color.BLACK);
+            if(i==1)floorPanel.setBackground(Color.BLACK);
             else floorPanel.setBackground(Color.WHITE);
             elevatorPanel.add(floorPanel);
         }
