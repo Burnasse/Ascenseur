@@ -8,7 +8,7 @@ public class DisplayPanel extends JPanel{
 
     private JTextField floorTextField = new JTextField("Floor: 0");
     private JTextField motorTextField = new JTextField("Action: Stop");
-    private JTextField doorTextField = new JTextField("Door: close");
+    private JTextField doorTextField = new JTextField("Door: closed");
 
     private LinkedList<JPanel> floorRectList = new LinkedList<>();
 

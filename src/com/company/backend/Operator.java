@@ -1,6 +1,12 @@
 package com.company.backend;
 
+import com.company.frontend.ControlPanel;
+import com.company.frontend.GlobalPanel;
+
+import java.awt.*;
 import java.util.*;
+
+import static java.lang.Thread.sleep;
 
 public class Operator {
 
@@ -15,6 +21,8 @@ public class Operator {
     private volatile Cabin cabin = new Cabin();
     private volatile Engine engine = new Engine();
     private volatile Door door = new Door(); // faut l'utiliser quelque part
+
+
 
     private Thread operatorThread;
 
@@ -40,6 +48,9 @@ public class Operator {
                     try {
                         Thread.sleep(1500); // on attend pour simuler l'animation
                         if(nextGoalFloor == cabin.getFloor()) { // lorsque la cabine est arrivé, on regarde les futures destination
+                            this.doorOpen();
+                            Thread.sleep(10000);
+                            this.doorClose();
                             requests[nextGoalFloor] = false;
                             newGoalFloor();
                         }
@@ -52,8 +63,8 @@ public class Operator {
                     }
                 }
             }
-        });
-
+        }
+        );
         operatorThread.start();
     }
 
@@ -158,11 +169,14 @@ public class Operator {
 
         this.requests[floorNumberOfRequest] = true;
         System.out.println("new last request" + nextGoalFloor);
-
     }
 
     public void EmergencyPressed(){
 
+    }
+
+    public boolean getDoorStatus(){
+        return door.isOpen();
     }
 
     public boolean hasRequest(){
@@ -186,5 +200,15 @@ public class Operator {
 
     public void setLastMinRequest(int lastMinRequest) {
         this.lastMinRequest = lastMinRequest;
+    }
+
+    public Thread getOperatorThread() {
+        return operatorThread;
+    }
+    public void doorOpen(){
+        door.toOpen();
+    }
+    public void doorClose(){
+        door.toClose();
     }
 }

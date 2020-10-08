@@ -26,6 +26,7 @@ public class ControlPanel extends JPanel{
 
         this.operator = operator;
 
+
         for (int i = 0; i < floorNumber; i++) {
             int floor = i;
 
@@ -64,22 +65,10 @@ public class ControlPanel extends JPanel{
             motorTextField.setText("Action: Emergency mode");
             motorTextField.setForeground(Color.red);
         });
-        openTheGate.addActionListener(e -> {
-            doorTextField.setText("Door: open");
-            doorTextField.setForeground(Color.green);
-            new Thread(() -> {
-                try {
-                    sleep(2000);
-                    doorTextField.setText("Door: close");
-                    doorTextField.setForeground(Color.red);
-                } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
-                }
-            }).start();
-        });
 
         add(elevatorPanel);
         add(outDoorPanel);
     }
+
 
 }
