@@ -21,9 +21,9 @@ public class Engine {
     }
 
     public void emergencyStop(){
-        isOn = false;
-        onAscend = false;
-        onDescend = false;
+        isOn = !isOn;
+        onAscend = !onAscend;
+        onDescend = !onDescend;
     }
 
     public boolean isOn() {
