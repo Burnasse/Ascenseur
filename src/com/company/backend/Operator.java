@@ -140,6 +140,12 @@ public class Operator extends Thread {
                 return true;
             }
         }
+        for (int i = requests.length-1; i > nextGoalFloor; i--){
+            if (requests[i].isRequest() && !requests[i].isGoingUp() && !requests[i].isInside()){
+                nextGoalFloor = i;
+                return true;
+            }
+        }
         return false;
     }
 
@@ -255,6 +261,12 @@ public class Operator extends Thread {
             synchronized (this) {
                 notify();
             }
+        }
+    }
+
+    public  void notifyOperatorThread() throws InterruptedException{
+        synchronized (this){
+            this.notify();
         }
     }
 

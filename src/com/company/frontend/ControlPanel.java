@@ -88,4 +88,8 @@ public class ControlPanel extends JPanel{
     public Map<String, JButton> getButtonMap() {
         return buttonMap;
     }
+
+    public Operator getOperator(){
+        return operator;
+    }
 }
