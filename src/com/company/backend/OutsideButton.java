@@ -4,30 +4,23 @@ import com.company.frontend.GlobalPanel;
 
 import java.awt.*;
 
+/**
+ * Represents button outside elevator.
+ */
 public class OutsideButton implements Button {
 
-    private int floor;
-    private boolean isGoingUp;
+    private final int floor;
+    private final boolean isGoingUp;
 
+    /**
+     * Instantiates a new Outside button.
+     *
+     * @param floor     the floor
+     * @param isGoingUp the is going up
+     */
     public OutsideButton(int floor, boolean isGoingUp) {
         this.floor = floor;
         this.isGoingUp = isGoingUp;
-    }
-
-    public int getFloor() {
-        return floor;
-    }
-
-    public void setFloor(int floor) {
-        this.floor = floor;
-    }
-
-    public boolean isGoingUp() {
-        return isGoingUp;
-    }
-
-    public void setGoingUp(boolean goingUp) {
-        isGoingUp = goingUp;
     }
 
     @Override

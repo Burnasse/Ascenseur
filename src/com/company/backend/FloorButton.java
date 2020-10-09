@@ -4,19 +4,19 @@ import com.company.frontend.GlobalPanel;
 
 import java.awt.*;
 
+/**
+ * Represents floor button inside elevator.
+ */
 public class FloorButton implements Button {
 
-    private int floor;
+    private final int floor;
 
+    /**
+     * Instantiates a new Floor button.
+     *
+     * @param floor the floor
+     */
     public FloorButton(int floor) {
-        this.floor = floor;
-    }
-
-    public int getFloor() {
-        return floor;
-    }
-
-    public void setFloor(int floor) {
         this.floor = floor;
     }
 

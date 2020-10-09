@@ -4,6 +4,9 @@ import com.company.frontend.GlobalPanel;
 
 import java.awt.*;
 
+/**
+ * Represent the emergency button
+ */
 public class EmergencyButton implements Button {
 
     private boolean isPressed = false;

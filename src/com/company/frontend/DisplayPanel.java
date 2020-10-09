@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.LinkedList;
 
+/**
+ * The type Display panel display the information about the engine, door, floor and elevator.
+ */
 public class DisplayPanel extends JPanel{
 
     private JTextField floorTextField = new JTextField("Floor: 0");
@@ -14,6 +17,11 @@ public class DisplayPanel extends JPanel{
 
     private JPanel textFieldPanel = new JPanel();
 
+    /**
+     * Instantiates a new Display panel.
+     *
+     * @param floorNumber the floor number
+     */
     public DisplayPanel(int floorNumber){
         GridLayout textFieldLayout = new GridLayout(3,1);
         motorTextField.setForeground(Color.GREEN);
@@ -40,18 +48,38 @@ public class DisplayPanel extends JPanel{
         add(elevatorPanel);
     }
 
+    /**
+     * Gets floor text field.
+     *
+     * @return the floor text field
+     */
     public JTextField getFloorTextField() {
         return floorTextField;
     }
 
+    /**
+     * Gets motor text field.
+     *
+     * @return the motor text field
+     */
     public JTextField getMotorTextField() {
         return motorTextField;
     }
 
+    /**
+     * Gets door text field.
+     *
+     * @return the door text field
+     */
     public JTextField getDoorTextField() {
         return doorTextField;
     }
 
+    /**
+     * Gets floor rect list.
+     *
+     * @return the floor rect list
+     */
     public LinkedList<JPanel> getFloorRectList() {
         return floorRectList;
     }

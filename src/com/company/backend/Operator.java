@@ -2,17 +2,38 @@ package com.company.backend;
 
 import java.util.*;
 
+/**
+ * The type Operator represents the operative part of the elevator.
+ * He make the link between all object (cabin, engine, door, button)
+ * and handle all events coming from the interface.
+ * It is the operator who determines where the elevator should go.
+ */
 public class Operator extends Thread {
 
+    /**
+     * The array of requests, the index represent the floor.
+     */
     private final Request[] requests;
+
+    /**
+     * The map of inside and outside buttons.
+     */
     private final Map<String, Button> buttons = new HashMap<>();
 
+    /**
+     * The goal floor of the elevator.
+     */
     private int nextGoalFloor = -1;
 
     private volatile Cabin cabin = new Cabin();
     private volatile Engine engine = new Engine();
     private volatile Door door = new Door();
 
+    /**
+     * Instantiates a new Operator.
+     *
+     * @param floorNumber the floor number
+     */
     public Operator(int floorNumber) {
         requests = new Request[floorNumber];
 
@@ -29,48 +50,71 @@ public class Operator extends Thread {
 
     @Override
     public void run() {
-        try {
-            startOperator();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // démarre le thread qui lira toutes les commandes
-    private void startOperator() throws InterruptedException {
         while (true) {
-            if (!engine.isOn()) waitOperatorThread(-1);
-            if (cabin.getDirection() != Direction.NONE) { // si la cabine a une direction
-                waitOperatorThread(1500);// on attend pour simuler l'animation
-                if (nextGoalFloor == cabin.getFloor()) { // lorsque la cabine est arrivé, on regarde les futures destination
-                    doorOpen();
-                    waitOperatorThread(5000);
-                    doorClose();
-                    requests[nextGoalFloor].setRequest(false);
-                    if(requests[nextGoalFloor].isInside())
-                        buttons.get("button"+nextGoalFloor).displayAction();
-                    else if(!requests[nextGoalFloor].isInside() && requests[nextGoalFloor].isGoingUp())
-                        buttons.get("outsideUpButton"+nextGoalFloor).displayAction();
-                    else if(!requests[nextGoalFloor].isInside() && !requests[nextGoalFloor].isGoingUp())
-                        buttons.get("outsideDownButton"+nextGoalFloor).displayAction();
-                    newGoalFloor();
-                } else if (cabin.getDirection() == Direction.UP) // augmente l'étage si la cabine monte
-                    cabin.setFloor(cabin.getFloor() + 1);
-                else
-                    cabin.setFloor(cabin.getFloor() - 1);// diminue l'étage si la cabine descend
+            try {
+                if (!engine.isOn()) waitOperatorThread(-1);
+                if (cabin.getDirection() != Direction.NONE) {
+                    waitOperatorThread(1500);
+                    if (nextGoalFloor == cabin.getFloor()) {
+                        door.toOpen();
+                        waitOperatorThread(5000);
+                        door.toClose();
+                        requests[nextGoalFloor].setRequest(false);
+                        if (requests[nextGoalFloor].isInside())
+                            buttons.get("button" + nextGoalFloor).displayAction();
+                        else if (!requests[nextGoalFloor].isInside() && requests[nextGoalFloor].isGoingUp())
+                            buttons.get("outsideUpButton" + nextGoalFloor).displayAction();
+                        else if (!requests[nextGoalFloor].isInside() && !requests[nextGoalFloor].isGoingUp())
+                            buttons.get("outsideDownButton" + nextGoalFloor).displayAction();
+                        newGoalFloor();
+                        System.out.println("New goal floor: " + nextGoalFloor);
+                    }else if (cabin.getDirection() == Direction.UP) cabin.setFloor(cabin.getFloor() + 1);
+                    else cabin.setFloor(cabin.getFloor() - 1);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+        }
 
+    }
+
+    /**
+     *
+     * Simulate the waiting time by pausing the operator's thread.
+     * If milliseconds = -1, the thread keep waiting until the call of notify()
+     *
+     * @param milliseconds time to wait.
+     * @throws InterruptedException the exception
+     */
+    private void waitOperatorThread(int milliseconds) throws InterruptedException {
+        synchronized (this) {
+            if (milliseconds == -1)
+                wait();
+            else
+                wait(milliseconds);
         }
     }
 
+    /**
+     * Check if the elevator has requests.
+     *
+     * @return the boolean
+     */
+    private boolean hasRequest() {
+        for (Request bool : requests) {
+            if (bool.isRequest()) return true;
+        }
+        return false;
+    }
 
-
-    /* trouve le nouveau goal floor après avoir atteint le précédent*/
+    /**
+     * Find the new goal floor, if none are find, set the nextGoalFloor to -1.
+     */
     private void newGoalFloor() {
         if (!hasRequest()) {
             cabin.setDirection(Direction.NONE);
             nextGoalFloor = -1;
-            System.out.println("aucun autre arret");
+            System.out.println("Aucun autre arret");
         }
         if (cabin.getDirection() == Direction.UP) {
             if (hasUpRequest()) return;
@@ -84,7 +128,11 @@ public class Operator extends Thread {
         }
     }
 
-    // cherche si il y a une requete au dessus du goal (ca sera toujours la position de la cabine)
+    /**
+     * Return true if there are requests at the top.
+     *
+     * @return the boolean
+     */
     private boolean hasUpRequest() {
         for (int i = nextGoalFloor; i < requests.length; i++) {
             if ((requests[i].isRequest() && requests[i].isInside()) || (requests[i].isRequest() && requests[i].isGoingUp())) {
@@ -95,9 +143,13 @@ public class Operator extends Thread {
         return false;
     }
 
-    // cherche si il y a une requete en dessous du goal (ca sera toujours la position de la cabine)
+    /**
+     * Return true if there are requests at the bottom.
+     *
+     * @return the boolean
+     */
     private boolean hasDownRequest() {
-        for (int i = nextGoalFloor; i > 0; i--) {
+        for (int i = nextGoalFloor; i >= 0; i--) {
             if ((requests[i].isRequest() && requests[i].isInside()) || (requests[i].isRequest() && !requests[i].isGoingUp())) {
                 nextGoalFloor = i;
                 return true;
@@ -106,48 +158,52 @@ public class Operator extends Thread {
         return false;
     }
 
+    /**
+     * Initialize the nextGoalFloor when the elevator has no request.
+     *
+     * @param floorNumberRequest floor number of the request.
+     */
+    private void initCabinMovement(int floorNumberRequest) {
+        if (nextGoalFloor == -1) {
+            nextGoalFloor = floorNumberRequest;
+            if (cabin.getFloor() < floorNumberRequest) {
+                cabin.setDirection(Direction.UP);
+                engine.ascend();
+            } else {
+                cabin.setDirection(Direction.DOWN);
+                engine.descend();
+            }
+        }
+    }
+
+    /**
+     * Takes a new request for a floor from inside the elevator and activate the corresponding items.
+     *
+     * @param floorNumberRequest the floor number request
+     */
     public void newRequestInsideCabin(int floorNumberRequest) {
         System.out.println("precedent last request" + nextGoalFloor);
 
-        /* si la requete est deja existante , ne rien faire*/
-        if (this.requests[floorNumberRequest].isRequest())
+        if (requests[floorNumberRequest].isRequest())
             return;
-            /*sinon on rajoute la requete a la liste*/
         else {
-            this.requests[floorNumberRequest].setRequest(true);
-            this.requests[floorNumberRequest].setInside(true);
+            requests[floorNumberRequest].setRequest(true);
+            requests[floorNumberRequest].setInside(true);
         }
 
+        buttons.get("button" + floorNumberRequest).displayAction();
         initCabinMovement(floorNumberRequest);
 
-        buttons.get("button"+floorNumberRequest).displayAction();
-
+        if (cabin.getDirection() == Direction.DOWN && nextGoalFloor < floorNumberRequest && cabin.getFloor() > floorNumberRequest)
+            nextGoalFloor = floorNumberRequest;
+        if (cabin.getDirection() == Direction.UP && nextGoalFloor > floorNumberRequest && cabin.getFloor() < floorNumberRequest)
+            nextGoalFloor = floorNumberRequest;
     }
 
-    private void initCabinMovement(int floorNumberRequest) {
-        /* si il n'y a pas de prochain arret ( que l'assenceur bouge pas ) on va a la nouvelle requete et met la direction vers la requete ( la cabine n'est pas a l'etage de la requete )*/
-        if (this.nextGoalFloor == -1) {
-            this.nextGoalFloor = floorNumberRequest;
-            if (cabin.getFloor() < floorNumberRequest) {
-                cabin.setDirection(Direction.UP);
-                this.engine.ascend();
-            } else {
-                cabin.setDirection(Direction.DOWN);
-                this.engine.descend();
-            }
-        }
-
-        /* si cabine va vers le bas, que le prochaine etage d'arret est apres le nouvel etage d'arret et que la cabine est au dessus du nouvel etage d'arret, alors on s'arrete la bas */
-        if (cabin.getDirection() == Direction.DOWN && this.nextGoalFloor < floorNumberRequest && cabin.getFloor() > floorNumberRequest )
-            this.nextGoalFloor = floorNumberRequest;
-
-        /* si cabine va vers le haut, que le prochaine etage d'arret est apres le nouvel etage d'arret et que la cabine est en dessous du nouvel etage d'arret, alors on s'arrete la bas */
-        if (cabin.getDirection() == Direction.UP && this.nextGoalFloor > floorNumberRequest && cabin.getFloor() < floorNumberRequest )
-            this.nextGoalFloor = floorNumberRequest;
-    }
-
-    /*
-    Pas utilisé pour l'instant
+    /**
+     * Takes a new request to go up from outside the elevator and activate the corresponding items.
+     *
+     * @param floorNumberOfRequest the floor number of request
      */
     public void newUpRequestOutsideCabin(int floorNumberOfRequest) {
         System.out.println("precedent last request" + nextGoalFloor);
@@ -155,70 +211,50 @@ public class Operator extends Thread {
         if (this.requests[floorNumberOfRequest].isRequest())
             return;
 
-        buttons.get("outsideUpButton"+floorNumberOfRequest).displayAction();
+        buttons.get("outsideUpButton" + floorNumberOfRequest).displayAction();
 
         initCabinMovement(floorNumberOfRequest);
 
-        this.requests[floorNumberOfRequest].setRequest(true);
-        this.requests[floorNumberOfRequest].setGoingUp(true);
-        this.requests[floorNumberOfRequest].setInside(false);
+        requests[floorNumberOfRequest].setRequest(true);
+        requests[floorNumberOfRequest].setGoingUp(true);
+        requests[floorNumberOfRequest].setInside(false);
         System.out.println("new last request" + nextGoalFloor);
 
     }
 
+    /**
+     * Takes a new request to go down from outside the elevator and activate the corresponding items.
+     *
+     * @param floorNumberOfRequest the floor number of request
+     */
     public void newDownRequestOutsideCabin(int floorNumberOfRequest) {
-        System.out.println("precedent last request" + nextGoalFloor);
+        System.out.println("precedent last request : " + nextGoalFloor);
 
         if (this.requests[floorNumberOfRequest].isRequest())
             return;
 
-        buttons.get("outsideDownButton"+floorNumberOfRequest).displayAction();
+        buttons.get("outsideDownButton" + floorNumberOfRequest).displayAction();
 
         initCabinMovement(floorNumberOfRequest);
 
-        this.requests[floorNumberOfRequest].setRequest(true);
-        this.requests[floorNumberOfRequest].setGoingUp(false);
-        this.requests[floorNumberOfRequest].setInside(false);
-        System.out.println("new last request" + nextGoalFloor);
+        requests[floorNumberOfRequest].setRequest(true);
+        requests[floorNumberOfRequest].setGoingUp(false);
+        requests[floorNumberOfRequest].setInside(false);
+        System.out.println("new last request : " + nextGoalFloor);
 
     }
 
+    /**
+     * Activate emergency mode.
+     */
     public void EmergencyPressed() {
         System.out.println("EMERGENCY");
         engine.emergencyStop();
         buttons.get("Emergency").displayAction();
         if (engine.isOn()) {
             synchronized (this) {
-                this.notify();
+                notify();
             }
-        }
-    }
-
-    public boolean getDoorStatus() {
-        return door.isOpen();
-    }
-
-    public boolean hasRequest() {
-        for (Request bool : requests) {
-            if (bool.isRequest()) return true;
-        }
-        return false;
-    }
-
-    public void doorOpen() {
-        door.toOpen();
-    }
-
-    public void doorClose() {
-        door.toClose();
-    }
-
-    public void waitOperatorThread(int milliseconds) throws InterruptedException {
-        synchronized (this) {
-            if (milliseconds == -1)
-                wait();
-            else
-                wait(milliseconds);
         }
     }
 

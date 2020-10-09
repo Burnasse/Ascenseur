@@ -7,6 +7,9 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The type Control panel represents all buttons used by the elevator.
+ */
 public class ControlPanel extends JPanel{
 
     private Map<String, JButton> buttonMap = new HashMap<>();
@@ -16,6 +19,12 @@ public class ControlPanel extends JPanel{
 
     private Operator operator;
 
+    /**
+     * Instantiates a new Control panel.
+     *
+     * @param floorNumber the floor number
+     * @param operator    the operator
+     */
     public ControlPanel(int floorNumber, Operator operator){
         setLayout(new GridLayout(1,2));
 
@@ -30,7 +39,6 @@ public class ControlPanel extends JPanel{
         for (int i = 0; i < floorNumber; i++) {
             int floor = i;
 
-            /* creation bouton de l'etage i interieur */
             FloorButton newButton = new FloorButton(i);
             newButton.addActionListener(e->{
                 operator.newRequestInsideCabin(floor);
@@ -38,14 +46,12 @@ public class ControlPanel extends JPanel{
             buttonMap.put(newButton.getText(),newButton);
             elevatorPanel.add(newButton);
 
-            /* creation bouton up de l'etage i*/
             JButton callH = new JButton("H"+i);
             callH.addActionListener(e->{
                 this.operator.newUpRequestOutsideCabin(floor);
                     }
             );
             buttonMap.put(callH.getText(),callH);
-            /* creation bouton down de l'etage i*/
 
             JButton callD = new JButton("D"+i);
             callD.addActionListener(e->{
@@ -74,6 +80,11 @@ public class ControlPanel extends JPanel{
         add(outDoorPanel);
     }
 
+    /**
+     * Gets button map.
+     *
+     * @return the button map
+     */
     public Map<String, JButton> getButtonMap() {
         return buttonMap;
     }
