@@ -1,5 +1,7 @@
 package com.company.backend;
 
+import com.company.frontend.GlobalPanel;
+
 /**
  * The type Engine.
  */
@@ -68,5 +70,19 @@ public class Engine {
      */
     public boolean isOnDescend() {
         return onDescend;
+    }
+
+    public void stop(){
+        onAscend = false;
+        onDescend = false;
+        GlobalPanel.displayPanel.getMotorTextField().setText("Action: stop");
+    }
+
+    public void start(Direction direction) {
+        if(direction == Direction.UP)
+            onDescend = true;
+        else
+            onAscend = true;
+        GlobalPanel.displayPanel.getMotorTextField().setText("Action: working");
     }
 }

@@ -54,11 +54,13 @@ public class Operator extends Thread {
             try {
                 if (!engine.isOn()) waitOperatorThread(-1);
                 if (cabin.getDirection() != Direction.NONE) {
+                    engine.start(cabin.getDirection());
                     waitOperatorThread(1500);
                     if (nextGoalFloor == cabin.getFloor()) {
                         door.toOpen();
                         waitOperatorThread(5000);
                         door.toClose();
+                        engine.stop();
                         requests[nextGoalFloor].setRequest(false);
                         if (requests[nextGoalFloor].isInside())
                             buttons.get("button" + nextGoalFloor).displayAction();
@@ -67,7 +69,6 @@ public class Operator extends Thread {
                         else if (!requests[nextGoalFloor].isInside() && !requests[nextGoalFloor].isGoingUp())
                             buttons.get("outsideDownButton" + nextGoalFloor).displayAction();
                         newGoalFloor();
-                        System.out.println("New goal floor: " + nextGoalFloor);
                     }else if (cabin.getDirection() == Direction.UP) cabin.setFloor(cabin.getFloor() + 1);
                     else cabin.setFloor(cabin.getFloor() - 1);
                 }
@@ -75,11 +76,9 @@ public class Operator extends Thread {
                 e.printStackTrace();
             }
         }
-
     }
 
     /**
-     *
      * Simulate the waiting time by pausing the operator's thread.
      * If milliseconds = -1, the thread keep waiting until the call of notify()
      *
@@ -161,6 +160,12 @@ public class Operator extends Thread {
                 return true;
             }
         }
+        for (int i = 0; i < nextGoalFloor; i++){
+            if (requests[i].isRequest() && requests[i].isGoingUp() && !requests[i].isInside()){
+                nextGoalFloor = i;
+                return true;
+            }
+        }
         return false;
     }
 
@@ -226,6 +231,13 @@ public class Operator extends Thread {
         requests[floorNumberOfRequest].setInside(false);
         System.out.println("new last request" + nextGoalFloor);
 
+        for (int i = cabin.getFloor(); i < requests.length; i++) {
+            if(requests[i].isRequest() && requests[i].isGoingUp() && !requests[i].isInside()){
+                nextGoalFloor = i;
+                break;
+            }
+        }
+
     }
 
     /**
@@ -248,6 +260,12 @@ public class Operator extends Thread {
         requests[floorNumberOfRequest].setInside(false);
         System.out.println("new last request : " + nextGoalFloor);
 
+        for (int i = requests.length-1; i > cabin.getFloor(); i--) {
+            if(requests[i].isRequest() && !requests[i].isGoingUp() && !requests[i].isInside()){
+                nextGoalFloor = i;
+                break;
+            }
+        }
     }
 
     /**
@@ -261,12 +279,6 @@ public class Operator extends Thread {
             synchronized (this) {
                 notify();
             }
-        }
-    }
-
-    public  void notifyOperatorThread() throws InterruptedException{
-        synchronized (this){
-            this.notify();
         }
     }
 
